@@ -1,0 +1,19 @@
+{
+  "name": "assignment_9",
+  "version": "1.0.0",
+  "main": "src/main,js",
+  "repository": "https://github.com/KallMeMoh/Route-Node-Assignment9",
+  "author": "Mohammad",
+  "license": "MIT",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node src/main.js",
+    "dev": "cross-env NODE_ENV=development node --watch src/main.js"
+  },
+  "dependencies": {
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "mongoose": "^9.2.0"
+  },
+  "type": "module"
+}
