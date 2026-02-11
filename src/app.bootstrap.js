@@ -1,8 +1,11 @@
 import express from 'express';
 import { PORT } from '../config/config.service.js';
+import { connectDB } from './DB/connection.js';
 
 export default async function bootstrap() {
   const app = express();
+
+  await connectDB();
 
   app.use(express.json());
 
