@@ -16,3 +16,5 @@ export const SALT_ROUNDS = process.env.SALT_ROUNDS || 10;
 
 export const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 export const ENCRYPTION_ALGO = process.env.ENCRYPTION_ALGO;
+
+export const JWT_SECRET = process.env.JWT_SECRET;

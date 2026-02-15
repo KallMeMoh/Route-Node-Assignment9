@@ -2,6 +2,7 @@ import { hash } from 'bcrypt';
 import { UserModel } from '../../DB/Model/User.model';
 import { encrypt } from '../../common/utils/security/encrypt';
 import { SALT_ROUNDS } from '../../../config/config.service';
+import { sign } from 'jsonwebtoken';
 
 export const registerService = async (req, res, next) => {
   try {
@@ -23,6 +24,33 @@ export const registerService = async (req, res, next) => {
     if (error.code === 11000 || error.name === 'MongoServerError')
       return res.status(409).json({ message: 'Email already exists' });
 
+    next(error);
+  }
+};
+
+export const loginService = async (req, res, next) => {
+  try {
+    const existingUser = await UserModel.findOne({ email: req.body.email });
+
+    if (!existingUser)
+      return res.status(401).json({ message: 'Invalid email or password' });
+
+    const passwordMatched = await compare(
+      req.body.password ?? '',
+      existingUser.password,
+    );
+
+    if (!passwordMatched)
+      return res.status(401).json({
+        message: 'Invalid email or password',
+      });
+
+    const token = sign({ id: existingUser._id }, JWT_SECRET, {
+      expiresIn: '1h',
+    });
+
+    return res.status(200).json({ message: 'Login successful', token });
+  } catch (error) {
     next(error);
   }
 };
