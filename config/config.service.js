@@ -9,4 +9,10 @@ config({
 });
 
 export const PORT = process.env.PORT || 3000;
+
 export const MONGODB_URI = process.env.MONGODB_URI;
+
+export const SALT_ROUNDS = process.env.SALT_ROUNDS || 10;
+
+export const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+export const ENCRYPTION_ALGO = process.env.ENCRYPTION_ALGO;
