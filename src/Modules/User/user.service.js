@@ -44,3 +44,14 @@ export const deleteUserService = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getUserServive = async (req, res, next) => {
+  try {
+    const user = await UserModel.findById(req.userId);
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    return res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
