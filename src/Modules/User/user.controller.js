@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { updateUserService } from './user.service';
+import { deleteUserService, updateUserService } from './user.service.js';
 
 export const userRouter = Router();
 
 userRouter.patch('/', updateUserService);
 
-userRouter.delete('/', () => {});
+userRouter.delete('/', deleteUserService);
 
 userRouter.get('/', () => {});
