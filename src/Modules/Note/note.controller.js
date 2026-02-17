@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   createNoteService,
+  deleteNoteService,
   replaceNoteService,
   updateAllService,
   updateNoteService,
@@ -30,4 +31,4 @@ noteRouter.get('/:noteId', () => {});
 
 noteRouter.patch('/:noteId', updateNoteService);
 
-noteRouter.delete('/:noteId', () => {});
+noteRouter.delete('/:noteId', deleteNoteService);

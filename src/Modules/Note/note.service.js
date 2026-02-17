@@ -89,3 +89,20 @@ export const updateAllService = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteNoteService = async (req, res, next) => {
+  try {
+    const note = await NoteModel.findById(req.userId);
+    if (!note) return res.status(404).json({ message: 'Note not found' });
+
+    if (note.userId !== req.userId)
+      return res.status(401).json({ message: 'You are not the owner' });
+
+    return res.status(200).json({ message: 'deleted', note });
+  } catch (error) {
+    if (error.name === 'ValidationError')
+      return res.status(400).json({ errors: error.errors });
+
+    next(error);
+  }
+};
