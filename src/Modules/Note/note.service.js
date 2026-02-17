@@ -106,3 +106,17 @@ export const deleteNoteService = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getSortedNotesService = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const notes = await NoteModel.find({ userId: req.userId })
+      .sort()
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    return res.status(200).json(notes);
+  } catch (error) {
+    next(error);
+  }
+};
