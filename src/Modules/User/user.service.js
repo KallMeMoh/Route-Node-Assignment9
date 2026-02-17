@@ -1,5 +1,5 @@
-import { encrypt } from '../../common/utils/security/encrypt';
-import { UserModel } from '../../DB/Model/User.model';
+import { encrypt } from "../../common/utils/security/encrypt.js";
+import { UserModel } from "../../DB/Model/User.model.js";
 
 export const updateUserService = async (req, res, next) => {
   try {
@@ -12,7 +12,7 @@ export const updateUserService = async (req, res, next) => {
       });
 
       if (existingUser)
-        return res.status(409).json({ message: 'Email already exists' });
+        return res.status(409).json({ message: "Email already exists" });
     }
 
     if (req.body.phone) req.body.phone = encrypt(req.body.phone);
@@ -21,14 +21,14 @@ export const updateUserService = async (req, res, next) => {
       runValidators: true,
     });
 
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    return res.status(200).json({ message: 'User updated' });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.status(200).json({ message: "User updated" });
   } catch (error) {
-    if (error.name === 'ValidationError')
+    if (error.name === "ValidationError")
       return res.status(400).json({ errors: error.errors });
 
     if (error.code === 11000)
-      return res.status(409).json({ message: 'Email already exists' });
+      return res.status(409).json({ message: "Email already exists" });
 
     next(error);
   }
@@ -38,8 +38,8 @@ export const deleteUserService = async (req, res, next) => {
   try {
     const user = await UserModel.findByIdAndDelete(req.userId);
 
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    return res.status(200).json({ message: 'User deleted' });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.status(200).json({ message: "User deleted" });
   } catch (error) {
     next(error);
   }
@@ -49,7 +49,7 @@ export const getUserServive = async (req, res, next) => {
   try {
     const user = await UserModel.findById(req.userId);
 
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: "User not found" });
     return res.status(200).json(user);
   } catch (error) {
     next(error);
