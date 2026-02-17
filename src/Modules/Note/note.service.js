@@ -152,3 +152,25 @@ export const getNoteByContentService = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getDetailedNoteService = async (req, res, next) => {
+  try {
+    const notes = NoteModel.aggregate([
+      { $match: { userId: req.userId } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      { $unwind: '$user' },
+      { $project: { title: 1, userId: 1, createdAt: 1, 'user.email': 1 } },
+    ]);
+
+    return res.status(200).json(notes);
+  } catch (error) {
+    next(error);
+  }
+};
