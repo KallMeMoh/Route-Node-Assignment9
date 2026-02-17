@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createNoteService,
   deleteNoteService,
+  getNoteByContentService,
   getNoteService,
   getSortedNotesService,
   replaceNoteService,
@@ -21,7 +22,7 @@ noteRouter.patch('/all', updateAllService);
 noteRouter.get('/paginate-sort', getSortedNotesService);
 
 // /notes/note-by-content?content=Workout Plan
-noteRouter.get('/note-by-content', () => {});
+noteRouter.get('/note-by-content', getNoteByContentService);
 
 noteRouter.get('/note-with-user', () => {});
 
