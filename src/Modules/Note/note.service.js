@@ -63,3 +63,29 @@ export const replaceNoteService = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateAllService = async (req, res, next) => {
+  try {
+    const { matchedCount } = await NoteModel.updateMany(
+      { _id: req.userId },
+      {
+        $set: {
+          title: req.body.title,
+        },
+      },
+      {
+        runValidators: true,
+      },
+    );
+
+    if (matchedCount > 0)
+      return res.status(404).json({ message: 'No note found' });
+
+    return res.status(200).json({ message: 'All notes updated' });
+  } catch (error) {
+    if (error.name === 'ValidationError')
+      return res.status(400).json({ errors: error.errors });
+
+    next(error);
+  }
+};

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createNoteService,
   replaceNoteService,
+  updateAllService,
   updateNoteService,
 } from './note.service.js';
 
@@ -11,7 +12,7 @@ noteRouter.post('/', createNoteService);
 
 noteRouter.put('/replace/:noteId', replaceNoteService);
 
-noteRouter.patch('/all', () => {});
+noteRouter.patch('/all', updateAllService);
 
 // /notes/paginate-sort?page=2&limit=3
 noteRouter.get('/paginate-sort', () => {});
