@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createNoteService,
   deleteNoteService,
+  getNoteService,
   getSortedNotesService,
   replaceNoteService,
   updateAllService,
@@ -28,7 +29,7 @@ noteRouter.get('/aggregate', () => {});
 
 noteRouter.delete('/', () => {});
 
-noteRouter.get('/:noteId', () => {});
+noteRouter.get('/:noteId', getNoteService);
 
 noteRouter.patch('/:noteId', updateNoteService);
 

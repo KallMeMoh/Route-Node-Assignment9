@@ -120,3 +120,18 @@ export const getSortedNotesService = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getNoteService = async (req, res, next) => {
+  try {
+    const note = await NoteModel.findById(req.params.noteId);
+
+    if (!note) return res.status(404).json({ message: 'Note not found' });
+
+    if (note.userId !== req.userId)
+      return res.status(401).json({ message: 'You are not the owner' });
+
+    return res.status(200).json(note);
+  } catch (error) {
+    next(error);
+  }
+};
