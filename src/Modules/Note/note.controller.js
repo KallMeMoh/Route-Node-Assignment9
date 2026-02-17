@@ -1,28 +1,28 @@
-import { Router } from 'express';
-import { createNoteService } from './note.service';
+import { Router } from "express";
+import { createNoteService, updateNoteService } from "./note.service.js";
 
 export const noteRouter = Router();
 
-noteRouter.post('/', createNoteService);
+noteRouter.post("/", createNoteService);
 
-noteRouter.put('/replace/:noteId', () => {});
+noteRouter.put("/replace/:noteId", updateNoteService);
 
-noteRouter.patch('/all', () => {});
+noteRouter.patch("/all", () => {});
 
 // /notes/paginate-sort?page=2&limit=3
-noteRouter.get('/paginate-sort', () => {});
+noteRouter.get("/paginate-sort", () => {});
 
 // /notes/note-by-content?content=Workout Plan
-noteRouter.get('/note-by-content', () => {});
+noteRouter.get("/note-by-content", () => {});
 
-noteRouter.get('/note-with-user', () => {});
+noteRouter.get("/note-with-user", () => {});
 
-noteRouter.get('/aggregate', () => {});
+noteRouter.get("/aggregate", () => {});
 
-noteRouter.delete('/', () => {});
+noteRouter.delete("/", () => {});
 
-noteRouter.get('/:noteId', () => {});
+noteRouter.get("/:noteId", () => {});
 
-noteRouter.patch('/:noteId', () => {});
+noteRouter.patch("/:noteId", () => {});
 
-noteRouter.delete('/:noteId', () => {});
+noteRouter.delete("/:noteId", () => {});
