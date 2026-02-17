@@ -139,7 +139,7 @@ export const getNoteService = async (req, res, next) => {
 export const getNoteByContentService = async (req, res, next) => {
   try {
     const note = await NoteModel.findOne({
-      content: { $like: `%${req.body.content}%` },
+      content: req.body.content,
     });
 
     if (!note) return res.status(404).json({ message: 'Note not found' });
