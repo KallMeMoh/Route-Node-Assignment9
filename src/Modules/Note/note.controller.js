@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import {
+  aggregateService,
   createNoteService,
+  deleteAllNotesService,
   deleteNoteService,
   getDetailedNoteService,
   getNoteByContentService,
@@ -27,9 +29,9 @@ noteRouter.get('/note-by-content', getNoteByContentService);
 
 noteRouter.get('/note-with-user', getDetailedNoteService);
 
-noteRouter.get('/aggregate', () => {});
+noteRouter.get('/aggregate', aggregateService);
 
-noteRouter.delete('/', () => {});
+noteRouter.delete('/', deleteAllNotesService);
 
 noteRouter.get('/:noteId', getNoteService);
 

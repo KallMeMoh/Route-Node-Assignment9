@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { NoteModel } from '../../DB/Model/Note.model.js';
 
 export const createNoteService = async (req, res, next) => {
@@ -19,7 +20,7 @@ export const updateNoteService = async (req, res, next) => {
 
     if (!note) return res.status(404).json({ message: 'Note not found' });
 
-    if (note.userId !== req.userId)
+    if (!note.userId.equals(req.userId))
       return res.status(401).json({ message: 'You are not the owner' });
 
     const { title, content } = req.body;
@@ -31,6 +32,9 @@ export const updateNoteService = async (req, res, next) => {
 
     return res.status(200).json({ message: 'updated', note: updatedNote });
   } catch (error) {
+    if (error.name === 'CastError')
+      return res.status(400).json({ message: 'Invalid note id' });
+
     if (error.name === 'ValidationError')
       return res.status(400).json({ errors: error.errors });
 
@@ -44,7 +48,7 @@ export const replaceNoteService = async (req, res, next) => {
 
     if (!note) return res.status(404).json({ message: 'Note not found' });
 
-    if (note.userId !== req.userId)
+    if (!note.userId.equals(req.userId))
       return res.status(401).json({ message: 'You are not the owner' });
 
     const { title, content, userId } = req.body;
@@ -57,6 +61,9 @@ export const replaceNoteService = async (req, res, next) => {
 
     return res.status(200).json({ message: 'updated', note: updatedNote });
   } catch (error) {
+    if (error.name === 'CastError')
+      return res.status(400).json({ message: 'Invalid note id' });
+
     if (error.name === 'ValidationError')
       return res.status(400).json({ errors: error.errors });
 
@@ -66,8 +73,8 @@ export const replaceNoteService = async (req, res, next) => {
 
 export const updateAllService = async (req, res, next) => {
   try {
-    const { matchedCount } = await NoteModel.updateMany(
-      { _id: req.userId },
+    const { modifiedCount } = await NoteModel.updateMany(
+      { userId: req.userId },
       {
         $set: {
           title: req.body.title,
@@ -78,11 +85,16 @@ export const updateAllService = async (req, res, next) => {
       },
     );
 
-    if (matchedCount > 0)
+    console.log(req.userId, modifiedCount);
+
+    if (modifiedCount === 0)
       return res.status(404).json({ message: 'No note found' });
 
     return res.status(200).json({ message: 'All notes updated' });
   } catch (error) {
+    if (error.name === 'CastError')
+      return res.status(400).json({ message: 'Invalid note id' });
+
     if (error.name === 'ValidationError')
       return res.status(400).json({ errors: error.errors });
 
@@ -92,14 +104,17 @@ export const updateAllService = async (req, res, next) => {
 
 export const deleteNoteService = async (req, res, next) => {
   try {
-    const note = await NoteModel.findById(req.userId);
+    const note = await NoteModel.findById(req.params.noteId);
     if (!note) return res.status(404).json({ message: 'Note not found' });
 
-    if (note.userId !== req.userId)
+    if (!note.userId.equals(req.userId))
       return res.status(401).json({ message: 'You are not the owner' });
 
     return res.status(200).json({ message: 'deleted', note });
   } catch (error) {
+    if (error.name === 'CastError')
+      return res.status(400).json({ message: 'Invalid note id' });
+
     if (error.name === 'ValidationError')
       return res.status(400).json({ errors: error.errors });
 
@@ -117,6 +132,9 @@ export const getSortedNotesService = async (req, res, next) => {
 
     return res.status(200).json(notes);
   } catch (error) {
+    if (error.name === 'CastError')
+      return res.status(400).json({ message: 'Invalid note id' });
+
     next(error);
   }
 };
@@ -127,11 +145,14 @@ export const getNoteService = async (req, res, next) => {
 
     if (!note) return res.status(404).json({ message: 'Note not found' });
 
-    if (note.userId !== req.userId)
+    if (!note.userId.equals(req.userId))
       return res.status(401).json({ message: 'You are not the owner' });
 
     return res.status(200).json(note);
   } catch (error) {
+    if (error.name === 'CastError')
+      return res.status(400).json({ message: 'Invalid note id' });
+
     next(error);
   }
 };
@@ -139,24 +160,57 @@ export const getNoteService = async (req, res, next) => {
 export const getNoteByContentService = async (req, res, next) => {
   try {
     const note = await NoteModel.findOne({
-      content: req.body.content,
+      content: req.query?.content,
     });
 
     if (!note) return res.status(404).json({ message: 'Note not found' });
 
-    if (note.userId !== req.userId)
+    if (!note.userId.equals(req.userId))
       return res.status(401).json({ message: 'You are not the owner' });
 
     return res.status(200).json(note);
   } catch (error) {
+    if (error.name === 'CastError')
+      return res.status(400).json({ message: 'Invalid note id' });
+
     next(error);
   }
 };
 
 export const getDetailedNoteService = async (req, res, next) => {
   try {
-    const notes = NoteModel.aggregate([
-      { $match: { userId: req.userId } },
+    const notes = await NoteModel.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(req.userId) } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userId',
+        },
+      },
+      { $unwind: '$userId' },
+      { $project: { title: 1, createdAt: 1, 'userId.email': 1 } },
+    ]);
+
+    return res.status(200).json(notes);
+  } catch (error) {
+    if (error.name === 'CastError')
+      return res.status(400).json({ message: 'Invalid note id' });
+
+    next(error);
+  }
+};
+
+export const aggregateService = async (req, res, next) => {
+  try {
+    const notes = await NoteModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(req.userId),
+          ...(req.query.title && { title: req.query.title }),
+        },
+      },
       {
         $lookup: {
           from: 'users',
@@ -166,11 +220,39 @@ export const getDetailedNoteService = async (req, res, next) => {
         },
       },
       { $unwind: '$user' },
-      { $project: { title: 1, userId: 1, createdAt: 1, 'user.email': 1 } },
+      {
+        $project: {
+          _id: 0,
+          title: 1,
+          userId: 1,
+          createdAt: 1,
+          'user.email': 1,
+          'user.name': 1,
+        },
+      },
     ]);
 
     return res.status(200).json(notes);
   } catch (error) {
+    if (error.name === 'CastError')
+      return res.status(400).json({ message: 'Invalid note id' });
+
+    next(error);
+  }
+};
+
+export const deleteAllNotesService = async (req, res, next) => {
+  try {
+    const { deletedCount } = await NoteModel.deleteMany({ userId: req.userId });
+
+    if (deletedCount === 0)
+      return res.status(404).json({ message: 'No notes found' });
+
+    return res.status(200).json({ message: 'Deleted' });
+  } catch (error) {
+    if (error.name === 'CastError')
+      return res.status(400).json({ message: 'Invalid note id' });
+
     next(error);
   }
 };

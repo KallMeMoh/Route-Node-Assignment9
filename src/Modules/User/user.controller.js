@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   deleteUserService,
-  getUserServive,
+  getUserService,
   updateUserService,
 } from './user.service.js';
 
@@ -11,4 +11,4 @@ userRouter.patch('/', updateUserService);
 
 userRouter.delete('/', deleteUserService);
 
-userRouter.get('/', getUserServive);
+userRouter.get('/', getUserService);
